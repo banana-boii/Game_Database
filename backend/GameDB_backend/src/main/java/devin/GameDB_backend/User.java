@@ -62,6 +62,11 @@ public class User {
         return passwordHash;
     }
 
+    // Setter for passwordHash
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
     // Getter for username
     public String getUsername() {
         return username;

@@ -1,8 +1,10 @@
 package devin.GameDB_backend;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import devin.GameDB_backend.User;
 import devin.GameDB_backend.UserRepository;
@@ -14,6 +16,13 @@ public class UserController {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Inject PasswordEncoder
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
@@ -36,14 +45,35 @@ public class UserController {
         }
         // You can add further validations here if needed
         
+        // Hash the password before saving
+        String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
+        user.setPasswordHash(hashedPassword);
+        
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully!");
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+        System.out.println("Received password: " + loginRequest.getPassword());
         // Validate user credentials and generate a token if needed.
-        return ResponseEntity.ok("Login successful!");
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                              .orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found.");
+        }
+        // Validate that a raw password is provided
+        if (loginRequest.getPassword() == null || loginRequest.getPassword().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Password is required.");
+        }
+        // Check password using BCrypt
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
+        }
+        
+        // Generate JWT token
+        String token = jwtUtil.generateToken(user.getUsername());
+        return ResponseEntity.ok(token);
     }
 
     @GetMapping("/test")
