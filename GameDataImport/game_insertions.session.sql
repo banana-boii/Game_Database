@@ -170,3 +170,37 @@ CREATE TABLE Game_Tags (
 ALTER TABLE games MODIFY detailed_description MEDIUMTEXT;
 
 ALTER TABLE games MODIFY about_the_game MEDIUMTEXT;
+
+
+CREATE TABLE Reviews (
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    game_id INT,
+    rating INT CHECK (rating BETWEEN 1 AND 10),
+    review_text TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (game_id) REFERENCES Games(game_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Saved_Games (
+    user_id INT,
+    game_id INT,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, game_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (game_id) REFERENCES Games(game_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    age INT CHECK (age >= 0),
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
