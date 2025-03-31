@@ -38,13 +38,32 @@ function GameList() {
     <div>
       <h2>Game List</h2>
       <ul>
-        {games.map(({ game, images, firstVideo }) => (
+        {games.map(({ game, headerImage, images, firstVideo }) => (
           <li key={game.gameId}>
             <h3>{game.name}</h3>
-            {/* Debugging */}
-            {console.log('Images for game:', game.name, images)}
-            {/* Horizontal Scrollbar for Images */}
+            {/* Horizontal Scrollbar for Header Image, Video, and Screenshots */}
             <div style={{ display: 'flex', overflowX: 'auto', gap: '10px', paddingBottom: '10px' }}>
+              {/* Header Image */}
+              {headerImage && (
+                <img
+                  src={headerImage}
+                  alt={`${game.name} header`}
+                  style={{
+                    height: '300px', // Fixed height
+                    width: `${300 * (16 / 9)}px`, // Maintain 16:9 aspect ratio
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                  }}
+                />
+              )}
+              {/* Video */}
+              {firstVideo && (
+                <video controls style={{ height: '300px', width: `${300 * (16 / 9)}px`, borderRadius: '8px' }}>
+                  <source src={firstVideo} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+              {/* Screenshots */}
               {images && images.map((image, index) => (
                 <img
                   key={index}
@@ -59,13 +78,6 @@ function GameList() {
                 />
               ))}
             </div>
-            {/* Video */}
-            {firstVideo && (
-              <video controls style={{ width: '100%', maxHeight: '300px', borderRadius: '8px' }}>
-                <source src={firstVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            )}
             {/* Game Details */}
             <p>Release Date: {game.releaseDate}</p>
             <p>Price: ${game.price}</p>

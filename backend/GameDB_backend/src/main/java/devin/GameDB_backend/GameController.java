@@ -30,8 +30,9 @@ public class GameController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Game> games = gameRepository.findAll(pageable);
 
-        // Map each game to a GameDTO with all images and the first video
+        // Map each game to a GameDTO with header image, all images, and the first video
         Page<GameDTO> gameDTOs = games.map(game -> {
+            String headerImage = game.getHeaderImage(); // Fetch the header image
             List<String> images = screenshotRepository.findAllByGameId(game.getGameId())
                     .stream()
                     .map(Screenshot::getImageUrl)
@@ -40,7 +41,7 @@ public class GameController {
                     .map(Movie::getVideoUrl)
                     .orElse(null);
 
-            return new GameDTO(game, images, firstVideo);
+            return new GameDTO(game, headerImage, images, firstVideo);
         });
 
         return ResponseEntity.ok(gameDTOs);

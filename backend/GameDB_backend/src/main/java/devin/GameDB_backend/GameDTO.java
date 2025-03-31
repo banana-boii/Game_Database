@@ -4,11 +4,13 @@ import java.util.List;
 
 public class GameDTO {
     private Game game;
+    private String headerImage;
     private List<String> images;
     private String firstVideo;
 
-    public GameDTO(Game game, List<String> images, String firstVideo) {
+    public GameDTO(Game game, String headerImage, List<String> images, String firstVideo) {
         this.game = game;
+        this.headerImage = headerImage;
         this.images = images;
         this.firstVideo = firstVideo;
     }
@@ -19,6 +21,14 @@ public class GameDTO {
 
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    public String getHeaderImage() {
+        return headerImage;
+    }
+
+    public void setHeaderImage(String headerImage) {
+        this.headerImage = headerImage;
     }
 
     public List<String> getImages() {
