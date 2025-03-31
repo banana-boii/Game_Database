@@ -3,8 +3,10 @@ import axios from 'axios';
 const API_BASE_URL = 'http://localhost:8080'; // Ensure this matches your backend URL
 
 // Game API calls
-export const fetchGames = async () => {
-  const response = await axios.get(`${API_BASE_URL}/games`);
+export const fetchGames = async (page = 0, size = 10) => {
+  const response = await axios.get(`${API_BASE_URL}/api/games/list`, {
+    params: { page, size }, // Pass pagination parameters
+  });
   return response.data;
 };
 
