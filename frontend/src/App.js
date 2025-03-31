@@ -52,9 +52,6 @@ function App() {
             <Route path="/user-profile" element={<UserProfile />} />
           </Routes>
         </main>
-        <footer>
-          <p>&copy; 2023 Game Database</p>
-        </footer>
       </div>
     </Router>
   );
