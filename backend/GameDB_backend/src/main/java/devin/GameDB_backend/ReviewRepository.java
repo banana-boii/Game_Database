@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByUser(User user);
-    List<Review> findByGameId(Long gameId);
+    List<Review> findByGame_GameId(Long gameId); // Ensure this method exists
 }

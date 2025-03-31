@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
     
     @Column(nullable = false)
@@ -25,13 +26,19 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
     
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
     
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private Timestamp createdAt;
     
+    // Getter for userId
+    public Long getUserId() {
+        return userId;
+    }
+
+    // Other getters and setters
     // Getter for email
     public String getEmail() {
         return email;

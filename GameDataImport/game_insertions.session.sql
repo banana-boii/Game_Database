@@ -171,11 +171,15 @@ ALTER TABLE games MODIFY detailed_description MEDIUMTEXT;
 
 ALTER TABLE games MODIFY about_the_game MEDIUMTEXT;
 
-
-CREATE TABLE Reviews (
-    review_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
+ALTER TABLE Games MODIFY COLUMN notes TEXT;
+CREATE TABLE Reviews (FY COLUMN reviews TEXT;
+    review_id INT AUTO_INCREMENT PRIMARY KEY,tion TEXT;
+    user_id INT,s MODIFY COLUMN support_url VARCHAR(500);
     game_id INT,
+    rating INT CHECK (rating BETWEEN 1 AND 10),
+    review_text TEXT,O_INCREMENT PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     rating INT CHECK (rating BETWEEN 1 AND 10),
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -183,16 +187,14 @@ CREATE TABLE Reviews (
     FOREIGN KEY (game_id) REFERENCES Games(game_id) ON DELETE CASCADE
 );
 
-
 CREATE TABLE Saved_Games (
-    user_id INT,
-    game_id INT,
+    user_id INT NOT NULL,
+    game_id INT NOT NULL,
     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, game_id),
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (game_id) REFERENCES Games(game_id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -203,4 +205,12 @@ CREATE TABLE Users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+
+
+);ALTER TABLE Reviews MODIFY COLUMN user_id INT;
+ALTER TABLE Reviews MODIFY COLUMN game_id INT;
+
+ALTER TABLE Saved_Games MODIFY COLUMN user_id INT;
+ALTER TABLE Saved_Games MODIFY COLUMN game_id INT;
+
+ALTER TABLE Users MODIFY COLUMN user_id INT AUTO_INCREMENT;
