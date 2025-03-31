@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import GameList from './pages/GameList';
@@ -12,27 +12,53 @@ import RemoveFavorite from './pages/RemoveFavorite';
 import GetFavorites from './pages/GetFavorites';
 import GetLibrary from './pages/GetLibrary';
 import UserProfile from './pages/UserProfile';
+import Logout from './pages/Logout';
+import ProtectedRoute from './components/ProtectedRoute';
 import './styles/App.css';
 
 function App() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const token = localStorage.getItem('token'); // Check if the user is logged in
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Clear the token
+    window.location.href = '/login'; // Redirect to login page
+  };
+
   return (
     <Router>
       <div className="App">
         <header>
           <h1>Game Database</h1>
           <nav>
-            <ul>
+            <ul className="nav-links">
               <li><Link to="/">Home</Link></li>
               <li><Link to="/games">Game List</Link></li>
-              <li><Link to="/register">Register</Link></li>
-              <li><Link to="/login">Login</Link></li>
-              <li><Link to="/add-review">Add Review</Link></li>
-              <li><Link to="/add-favorite">Add Favorite</Link></li>
-              <li><Link to="/add-to-library">Add to Library</Link></li>
-              <li><Link to="/remove-favorite">Remove Favorite</Link></li>
-              <li><Link to="/get-favorites">Get Favorites</Link></li>
-              <li><Link to="/get-library">Get Library</Link></li>
-              <li><Link to="/user-profile">User Profile</Link></li>
+              {!token && <li><Link to="/register">Register</Link></li>}
+              {!token && <li><Link to="/login">Login</Link></li>}
+              {token && (
+                <li className="profile-menu">
+                  <div onClick={toggleDropdown} className="profile-icon">
+                    <img
+                      src="https://via.placeholder.com/40" // Replace with a profile icon URL
+                      alt="Profile"
+                      className="profile-image"
+                    />
+                  </div>
+                  {isDropdownOpen && (
+                    <ul className="dropdown-menu">
+                      <li><Link to="/user-profile">Profile</Link></li>
+                      <li><Link to="/get-favorites">Favorites</Link></li>
+                      <li><Link to="/get-library">Library</Link></li>
+                      <li onClick={handleLogout}>Logout</li>
+                    </ul>
+                  )}
+                </li>
+              )}
             </ul>
           </nav>
         </header>
@@ -43,18 +69,66 @@ function App() {
             <Route path="/games/:id" element={<GameDetails />} />
             <Route path="/register" element={<RegisterUser />} />
             <Route path="/login" element={<LoginUser />} />
-            <Route path="/add-review" element={<AddReview />} />
-            <Route path="/add-favorite" element={<AddFavorite />} />
-            <Route path="/add-to-library" element={<AddToLibrary />} />
-            <Route path="/remove-favorite" element={<RemoveFavorite />} />
-            <Route path="/get-favorites" element={<GetFavorites />} />
-            <Route path="/get-library" element={<GetLibrary />} />
-            <Route path="/user-profile" element={<UserProfile />} />
+            <Route
+              path="/add-review"
+              element={
+                <ProtectedRoute>
+                  <AddReview />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add-favorite"
+              element={
+                <ProtectedRoute>
+                  <AddFavorite />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add-to-library"
+              element={
+                <ProtectedRoute>
+                  <AddToLibrary />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/remove-favorite"
+              element={
+                <ProtectedRoute>
+                  <RemoveFavorite />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/get-favorites"
+              element={
+                <ProtectedRoute>
+                  <GetFavorites />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/get-library"
+              element={
+                <ProtectedRoute>
+                  <GetLibrary />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/user-profile"
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/logout" element={<Logout />} />
           </Routes>
         </main>
-        <footer>
-          <p>&copy; 2023 Game Database</p>
-        </footer>
+        {/* Footer removed */}
       </div>
     </Router>
   );

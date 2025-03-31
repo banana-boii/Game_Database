@@ -2,6 +2,14 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080'; // Ensure this matches your backend URL
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No token found in localStorage');
+  }
+  return { Authorization: `Bearer ${token}` };
+};
+
 // Game API calls
 export const fetchGames = async () => {
   const response = await axios.get(`${API_BASE_URL}/games`);
@@ -20,8 +28,13 @@ export const registerUser = async (userData) => {
 };
 
 export const loginUser = async (loginData) => {
-  const response = await axios.post(`${API_BASE_URL}/api/users/login`, loginData);
-  return response.data;
+  try {
+    const response = await axios.post(`${API_BASE_URL}/api/users/login`, loginData);
+    return response.data; // Return the token
+  } catch (error) {
+    console.error('Error in loginUser API call:', error);
+    throw error;
+  }
 };
 
 export const addReview = async (userId, gameId, reviewData) => {
@@ -34,6 +47,7 @@ export const addReview = async (userId, gameId, reviewData) => {
 export const addFavorite = async (userId, gameId) => {
   const response = await axios.post(`${API_BASE_URL}/api/users/${userId}/favorites`, null, {
     params: { gameId },
+    headers: getAuthHeaders(),
   });
   return response.data;
 };
@@ -41,17 +55,22 @@ export const addFavorite = async (userId, gameId) => {
 export const removeFavorite = async (userId, gameId) => {
   const response = await axios.delete(`${API_BASE_URL}/api/users/${userId}/favorites`, {
     params: { gameId },
+    headers: getAuthHeaders(),
   });
   return response.data;
 };
 
 export const getFavorites = async (userId) => {
-  const response = await axios.get(`${API_BASE_URL}/api/users/${userId}/favorites`);
+  const response = await axios.get(`${API_BASE_URL}/api/users/${userId}/favorites`, {
+    headers: getAuthHeaders(),
+  });
   return response.data;
 };
 
 export const getUserLibrary = async (userId) => {
-  const response = await axios.get(`${API_BASE_URL}/api/users/${userId}/library`);
+  const response = await axios.get(`${API_BASE_URL}/api/users/${userId}/library`, {
+    headers: getAuthHeaders(),
+  });
   return response.data;
 };
 

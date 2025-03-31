@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,6 +28,12 @@ public class UserController {
     @Autowired
     private SavedGameRepository savedGameRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
+    // In-memory blacklist for tokens (use a database or cache for production)
+    private final Set<String> tokenBlacklist = new HashSet<>();
+
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
         validateUser(user);
@@ -39,14 +47,24 @@ public class UserController {
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-        // Directly compare the provided password with the stored password
         if (!loginRequest.getPassword().equals(user.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
         }
 
-        // Generate a placeholder token (or return a success message)
-        String token = "dummy-token"; // Replace with actual token logic if needed
+        // Generate JWT token using the username
+        String token = jwtService.generateToken(user.getUsername());
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        // Extract the token without the "Bearer " prefix
+        String actualToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        // Add the token to the blacklist
+        tokenBlacklist.add(actualToken);
+
+        return ResponseEntity.ok("Logged out successfully.");
     }
 
     @PostMapping("/{userId}/reviews")
@@ -107,7 +125,9 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/favorites")
-    public ResponseEntity<List<SavedGame>> getFavorites(@PathVariable Long userId) {
+    public ResponseEntity<List<SavedGame>> getFavorites(@PathVariable Long userId, @RequestHeader("Authorization") String token) {
+        validateToken(token);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         List<SavedGame> favorites = savedGameRepository.findByUser(user);
@@ -115,9 +135,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/library")
-    public ResponseEntity<List<SavedGame>> getUserLibrary(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    public ResponseEntity<List<SavedGame>> getUserLibrary(@PathVariable Long userId, @RequestHeader("Authorization") String token) {
+        validateToken(token);
+
+        String username = jwtService.extractUsername(token, "secondArgument"); // Replace "secondArgument" with the actual required value
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
+
+        if (!user.getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
         List<SavedGame> library = savedGameRepository.findByUser(user);
         return ResponseEntity.ok(library);
     }
@@ -147,6 +175,24 @@ public class UserController {
         }
         if (user.getPasswordHash() == null || user.getPasswordHash().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required.");
+    }
+}
+
+// Add this method to the JwtService class
+public String extractUsername(String token) {
+    // Implement logic to extract username from the JWT token
+    // Example: Decode the token and extract the username claim
+    // This is a placeholder implementation
+    return "decodedUsername"; // Replace with actual decoding logic
+}
+
+    private void validateToken(String token) {
+        // Extract the token without the "Bearer " prefix
+        String actualToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        // Check if the token is blacklisted
+        if (tokenBlacklist.contains(actualToken)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is blacklisted. Please log in again.");
         }
     }
 }

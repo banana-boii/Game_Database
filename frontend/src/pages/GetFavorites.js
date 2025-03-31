@@ -2,36 +2,32 @@ import React, { useState } from 'react';
 import { getFavorites } from '../api';
 
 function GetFavorites() {
-  const [userId, setUserId] = useState('');
   const [favorites, setFavorites] = useState([]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchFavorites = async () => {
     try {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      if (!userId || !token) {
+        alert('Session expired. Please log in again.');
+        window.location.href = '/login'; // Redirect to login page
+        return;
+      }
       const data = await getFavorites(userId);
       setFavorites(data);
     } catch (error) {
       console.error('Error fetching favorites:', error);
+      alert('Failed to fetch favorites. Please try again.');
     }
   };
 
   return (
     <div>
-      <h2>Get Favorites</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          required
-        />
-        <button type="submit">Get Favorites</button>
-      </form>
+      <h2>Favorites</h2>
+      <button onClick={fetchFavorites}>Load Favorites</button>
       <ul>
-        {favorites.map((savedGame) => (
-          <li key={savedGame.id}>
-            {savedGame.game.name} - {savedGame.game.description}
-          </li>
+        {favorites.map((game) => (
+          <li key={game.id}>{game.game.name}</li>
         ))}
       </ul>
     </div>

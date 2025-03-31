@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { registerUser } from '../api';
+import '../styles/FormStyles.css'; // Import the shared CSS file
 
 function RegisterUser() {
   const [userData, setUserData] = useState({
@@ -26,15 +27,35 @@ function RegisterUser() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Register User</h2>
-      <input name="name" placeholder="Name" onChange={handleChange} required />
-      <input name="email" placeholder="Email" onChange={handleChange} required />
-      <input name="age" placeholder="Age" type="number" onChange={handleChange} required />
-      <input name="username" placeholder="Username" onChange={handleChange} required />
-      <input name="passwordHash" placeholder="Password" type="password" onChange={handleChange} required />
-      <button type="submit">Register</button>
-    </form>
+    <div>
+      <div className="page-background"></div> {/* Blurred background */}
+      <div className="form-container">
+        <h2 className="title">Register</h2>
+        <form className="form" onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label htmlFor="name">Name</label>
+            <input id="name" name="name" type="text" onChange={handleChange} required />
+          </div>
+          <div className="input-group">
+            <label htmlFor="email">Email</label>
+            <input id="email" name="email" type="email" onChange={handleChange} required />
+          </div>
+          <div className="input-group">
+            <label htmlFor="age">Age</label>
+            <input id="age" name="age" type="number" onChange={handleChange} required />
+          </div>
+          <div className="input-group">
+            <label htmlFor="username">Username</label>
+            <input id="username" name="username" type="text" onChange={handleChange} required />
+          </div>
+          <div className="input-group">
+            <label htmlFor="passwordHash">Password</label>
+            <input id="passwordHash" name="passwordHash" type="password" onChange={handleChange} required />
+          </div>
+          <button className="sign" type="submit">Register</button>
+        </form>
+      </div>
+    </div>
   );
 }
 
