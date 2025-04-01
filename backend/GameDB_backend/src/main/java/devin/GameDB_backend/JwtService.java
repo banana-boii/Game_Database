@@ -2,6 +2,7 @@ package devin.GameDB_backend;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,7 @@ public class JwtService {
         try {
             return Jwts.builder()
                     .setSubject(username)
-                    .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, SECRET_KEY)
+                    .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                     .compact();
         } catch (Exception e) {
             e.printStackTrace();

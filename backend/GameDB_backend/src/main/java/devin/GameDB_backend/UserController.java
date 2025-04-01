@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,6 +27,9 @@ public class UserController {
     @Autowired
     private SavedGameRepository savedGameRepository;
 
+    @Autowired
+    private JwtService jwtService; // Inject JwtService
+
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
         validateUser(user);
@@ -36,16 +40,20 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
+        System.out.println("Login request received for username: " + loginRequest.getUsername()); // Debugging log
+
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-        // Directly compare the provided password with the stored password
+        System.out.println("User found: " + user.getUsername()); // Debugging log
+
         if (!loginRequest.getPassword().equals(user.getPasswordHash())) {
+            System.out.println("Invalid credentials for username: " + loginRequest.getUsername()); // Debugging log
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
         }
 
-        // Generate a placeholder token (or return a success message)
-        String token = "dummy-token"; // Replace with actual token logic if needed
+        String token = jwtService.generateToken(user.getUsername());
+        System.out.println("Generated token: " + token); // Debugging log
         return ResponseEntity.ok(token);
     }
 
@@ -107,19 +115,52 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/favorites")
-    public ResponseEntity<List<SavedGame>> getFavorites(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<SavedGame> favorites = savedGameRepository.findByUser(user);
-        return ResponseEntity.ok(favorites);
+    public ResponseEntity<?> getUserFavorites(@PathVariable Long userId) {
+        try {
+            List<SavedGame> favoriteGames = savedGameRepository.findByUser_UserId(userId);
+            List<GameDTO> games = favoriteGames.stream()
+                    .map(savedGame -> new GameDTO(
+                            savedGame.getGame(),
+                            savedGame.getGame().getHeaderImage(),
+                            null, // No images for favorites
+                            null  // No videos for favorites
+                    ))
+                    .collect(Collectors.toList());
+
+            // Log the response for debugging
+            System.out.println("Favorites Response: " + games);
+
+            return ResponseEntity.ok(games);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"error\": \"An error occurred while fetching favorites.\"}");
+        }
     }
 
     @GetMapping("/{userId}/library")
-    public ResponseEntity<List<SavedGame>> getUserLibrary(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<SavedGame> library = savedGameRepository.findByUser(user);
-        return ResponseEntity.ok(library);
+    public ResponseEntity<?> getUserLibrary(@PathVariable Long userId) {
+        if (userId == null) {
+            return ResponseEntity.badRequest().body("User ID is required");
+        }
+
+        try {
+            List<SavedGame> savedGames = savedGameRepository.findByUser_UserId(userId);
+            List<GameDTO> games = savedGames.stream()
+                    .map(savedGame -> new GameDTO(
+                            savedGame.getGame(),
+                            savedGame.getGame().getHeaderImage(),
+                            null, // No images for library
+                            null  // No videos for library
+                    ))
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(games);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching the library.");
+        }
     }
 
     @GetMapping("/{userId}/profile")

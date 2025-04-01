@@ -15,6 +15,8 @@ import UserProfile from './pages/UserProfile';
 import './styles/App.css';
 
 function App() {
+  const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+
   return (
     <Router>
       <div className="App">
@@ -48,7 +50,10 @@ function App() {
             <Route path="/add-to-library" element={<AddToLibrary />} />
             <Route path="/remove-favorite" element={<RemoveFavorite />} />
             <Route path="/get-favorites" element={<GetFavorites />} />
-            <Route path="/get-library" element={<GetLibrary />} />
+            <Route
+              path="/get-library"
+              element={token ? <GetLibrary userId={12} token={token} /> : <LoginUser />}
+            />
             <Route path="/user-profile" element={<UserProfile />} />
           </Routes>
         </main>

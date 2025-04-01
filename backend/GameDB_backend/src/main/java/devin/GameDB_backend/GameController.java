@@ -41,6 +41,7 @@ public class GameController {
                     .map(Movie::getVideoUrl)
                     .orElse(null);
 
+            // Use the constructor without savedAt
             return new GameDTO(game, headerImage, images, firstVideo);
         });
 
