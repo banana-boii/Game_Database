@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import NavBar from '../components/NavBar';
+import FeaturedGames from '../components/FeaturedGames';
+import PopularGames from '../components/PopularGames';
 import { fetchGames } from '../api';
 
 function GameList() {
   const [games, setGames] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [genres, setGenres] = useState([]);
+  const [featuredGames, setFeaturedGames] = useState([]);
+  const [popularGames, setPopularGames] = useState([]);
 
   useEffect(() => {
     const loadGames = async () => {
@@ -19,7 +25,49 @@ function GameList() {
       }
     };
 
+    const loadGenres = async () => {
+      try {
+        const response = await fetch('/api/genres');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setGenres(data);
+      } catch (error) {
+        console.error('Error fetching genres:', error);
+      }
+    };
+
+    const loadFeaturedGames = async () => {
+      try {
+        const response = await fetch('/api/games/featured');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setFeaturedGames(data);
+      } catch (error) {
+        console.error('Error fetching featured games:', error);
+      }
+    };
+
+    const loadPopularGames = async () => {
+      try {
+        const response = await fetch('/api/games/popular');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setPopularGames(data);
+      } catch (error) {
+        console.error('Error fetching popular games:', error);
+      }
+    };
+
     loadGames();
+    loadGenres();
+    loadFeaturedGames();
+    loadPopularGames();
   }, [page]);
 
   const handleNextPage = () => {
@@ -36,6 +84,9 @@ function GameList() {
 
   return (
     <div>
+      <NavBar username="Banana_Boi" genres={genres} />
+      <FeaturedGames games={featuredGames} />
+      <PopularGames games={popularGames} />
       <h2>Game List</h2>
       <ul>
         {games.map(({ game, headerImage, images, firstVideo }) => (

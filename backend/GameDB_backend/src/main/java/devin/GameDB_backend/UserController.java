@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -88,7 +89,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Game already in " + collectionType + ".");
         }
 
-        SavedGame savedGame = new SavedGame(user, game, new Timestamp(System.currentTimeMillis()));
+        SavedGame savedGame = new SavedGame();
         savedGameRepository.save(savedGame);
         return ResponseEntity.ok("Game added to " + collectionType + ".");
     }
@@ -107,19 +108,21 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/favorites")
-    public ResponseEntity<List<SavedGame>> getFavorites(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<SavedGame> favorites = savedGameRepository.findByUser(user);
-        return ResponseEntity.ok(favorites);
+    public ResponseEntity<List<Game>> getUserFavorites(@PathVariable Long userId) {
+        List<SavedGame> favoriteGames = savedGameRepository.findFavoritesByUserId(userId);
+        List<Game> games = favoriteGames.stream()
+                .map(SavedGame::getGame)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(games);
     }
 
     @GetMapping("/{userId}/library")
-    public ResponseEntity<List<SavedGame>> getUserLibrary(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<SavedGame> library = savedGameRepository.findByUser(user);
-        return ResponseEntity.ok(library);
+    public ResponseEntity<List<Game>> getUserLibrary(@PathVariable Long userId) {
+        List<SavedGame> savedGames = savedGameRepository.findByUserId(userId);
+        List<Game> games = savedGames.stream()
+                .map(SavedGame::getGame)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(games);
     }
 
     @GetMapping("/{userId}/profile")

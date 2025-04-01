@@ -5,12 +5,12 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 @Entity
-@Table(name = "Games") // Match the table name in the SQL file
+@Table(name = "Games")
 public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "game_id") // Match the column name in the SQL file
+    @Column(name = "game_id")
     private Integer gameId;
 
     @Column(nullable = false)
@@ -22,74 +22,88 @@ public class Game {
     @Column(name = "required_age")
     private Integer requiredAge;
 
+    @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(name = "dlc_count")
+    @Column(name = "dlc_count", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer dlcCount;
 
-    @Column(name = "detailed_description", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "detailed_description", columnDefinition = "TEXT")
     private String detailedDescription;
 
-    @Column(name = "about_the_game", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "about_the_game", columnDefinition = "TEXT")
     private String aboutTheGame;
 
-    @Column(name = "short_description")
+    @Column(name = "short_description", columnDefinition = "TEXT")
     private String shortDescription;
 
+    @Column(columnDefinition = "TEXT")
     private String reviews;
 
-    @Column(name = "header_image")
+    @Column(name = "header_image", length = 500)
     private String headerImage;
 
+    @Column(length = 500)
     private String website;
 
-    @Column(name = "support_url")
+    @Column(name = "support_url", length = 500)
     private String supportUrl;
 
-    @Column(name = "support_email")
+    @Column(name = "support_email", length = 255)
     private String supportEmail;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean windows;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean mac;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean linux;
 
-    @Column(name = "metacritic_score")
+    @Column(name = "metacritic_score", columnDefinition = "INT CHECK (metacritic_score >= 0)")
     private Integer metacriticScore;
 
-    @Column(name = "metacritic_url")
+    @Column(name = "metacritic_url", length = 500)
     private String metacriticUrl;
 
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer achievements;
 
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer recommendations;
 
+    @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Column(name = "user_score")
+    @Column(name = "user_score", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer userScore;
 
-    @Column(name = "score_rank")
+    @Column(name = "score_rank", length = 100)
     private String scoreRank;
 
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer positive;
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer negative;
 
-    @Column(name = "estimated_owners")
+    @Column(name = "estimated_owners", length = 50)
     private String estimatedOwners;
 
-    @Column(name = "average_playtime_forever")
+    @Column(name = "average_playtime_forever", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer averagePlaytimeForever;
 
-    @Column(name = "average_playtime_2weeks")
+    @Column(name = "average_playtime_2weeks", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer averagePlaytime2weeks;
 
-    @Column(name = "median_playtime_forever")
+    @Column(name = "median_playtime_forever", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer medianPlaytimeForever;
 
-    @Column(name = "median_playtime_2weeks")
+    @Column(name = "median_playtime_2weeks", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer medianPlaytime2weeks;
 
-    @Column(name = "peak_ccu")
+    @Column(name = "peak_ccu", nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer peakCcu;
 
     // Getters and Setters

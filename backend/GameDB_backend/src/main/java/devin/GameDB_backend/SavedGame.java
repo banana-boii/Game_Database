@@ -7,39 +7,29 @@ import java.sql.Timestamp;
 @Table(name = "Saved_Games")
 public class SavedGame {
 
-    @EmbeddedId
-    private SavedGameId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "saved_game_id")
+    private Long savedGameId;
 
     @ManyToOne
-    @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @MapsId("gameId")
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
-    @Column(name = "saved_at", nullable = false, updatable = false)
-    private Timestamp savedAt;
-
-    // Constructors
-    public SavedGame() {}
-
-    public SavedGame(User user, Game game, Timestamp savedAt) {
-        this.id = new SavedGameId(user.getUserId(), game.getGameId());
-        this.user = user;
-        this.game = game;
-        this.savedAt = savedAt;
-    }
+    @Column(name = "created_at", nullable = false)
+    private Timestamp createdAt;
 
     // Getters and Setters
-    public SavedGameId getId() {
-        return id;
+    public Long getSavedGameId() {
+        return savedGameId;
     }
 
-    public void setId(SavedGameId id) {
-        this.id = id;
+    public void setSavedGameId(Long savedGameId) {
+        this.savedGameId = savedGameId;
     }
 
     public User getUser() {
@@ -48,10 +38,6 @@ public class SavedGame {
 
     public void setUser(User user) {
         this.user = user;
-        if (this.id == null) {
-            this.id = new SavedGameId();
-        }
-        this.id.setUserId(user.getUserId());
     }
 
     public Game getGame() {
@@ -60,17 +46,13 @@ public class SavedGame {
 
     public void setGame(Game game) {
         this.game = game;
-        if (this.id == null) {
-            this.id = new SavedGameId();
-        }
-        this.id.setGameId(game.getGameId());
     }
 
-    public Timestamp getSavedAt() {
-        return savedAt;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
-    public void setSavedAt(Timestamp savedAt) {
-        this.savedAt = savedAt;
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }
