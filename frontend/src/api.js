@@ -26,19 +26,44 @@ export const loginUser = async (loginData) => {
   return response.data;
 };
 
+
+
+// In api.js
 export const addReview = async (userId, gameId, reviewData) => {
-  const response = await axios.post(`${API_BASE_URL}/api/users/${userId}/reviews`, reviewData, {
-    params: { gameId },
-  });
-  return response.data;
+  try {
+    console.log('Sending review data:', {
+      userId,
+      gameId,
+      rating: reviewData.rating,
+      reviewText: reviewData.reviewText
+    });
+    
+    const response = await fetch(`http://localhost:8080/api/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: userId,
+        gameId: gameId,
+        rating: reviewData.rating,
+        reviewText: reviewData.reviewText
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Server responded with error:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+    
+    return await response.text();
+  } catch (error) {
+    console.error('Error in addReview API call:', error);
+    throw error;
+  }
 };
 
-export const addFavorite = async (userId, gameId) => {
-  const response = await axios.post(`${API_BASE_URL}/api/users/${userId}/favorites`, null, {
-    params: { gameId },
-  });
-  return response.data;
-};
 
 export const removeFavorite = async (userId, gameId) => {
   const response = await axios.delete(`${API_BASE_URL}/api/users/${userId}/favorites`, {
