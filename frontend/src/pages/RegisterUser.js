@@ -1,40 +1,77 @@
 import React, { useState } from 'react';
-import { registerUser } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 function RegisterUser() {
-  const [userData, setUserData] = useState({
+  const [formData, setFormData] = useState({
     name: '',
+    phone: '',
     email: '',
     age: '',
     username: '',
-    passwordHash: '',
+    password: '',
   });
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await registerUser(userData);
-      alert(response);
-    } catch (error) {
-      console.error('Error registering user:', error);
+      const response = await fetch('http://localhost:8080/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Registration failed: ${errorText}`);
+      }
+
+      navigate('/login'); // Redirect to login page after successful registration
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(err.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Register User</h2>
-      <input name="name" placeholder="Name" onChange={handleChange} required />
-      <input name="email" placeholder="Email" onChange={handleChange} required />
-      <input name="age" placeholder="Age" type="number" onChange={handleChange} required />
-      <input name="username" placeholder="Username" onChange={handleChange} required />
-      <input name="passwordHash" placeholder="Password" type="password" onChange={handleChange} required />
-      <button type="submit">Register</button>
-    </form>
+    <div>
+      <h2>Register</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Name:</label>
+          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Phone:</label>
+          <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
+        </div>
+        <div>
+          <label>Email:</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Age:</label>
+          <input type="number" name="age" value={formData.age} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Username:</label>
+          <input type="text" name="username" value={formData.username} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+        </div>
+        <button type="submit">Register</button>
+      </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </div>
   );
 }
 

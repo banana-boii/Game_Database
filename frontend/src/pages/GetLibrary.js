@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react';
+import { jwtDecode } from 'jwt-decode'; // Use named export
 
-function GetLibrary({ userId, token }) {
+function GetLibrary() {
   const [library, setLibrary] = useState([]);
   const [error, setError] = useState(null);
 
+  const token = localStorage.getItem('jwtToken'); // Retrieve the token from localStorage
+  let userId;
+  try {
+    userId = jwtDecode(token).userId; // Extract user_id from the token
+    console.log('Extracted userId from token:', userId); // Debugging log
+  } catch (err) {
+    console.error('Error decoding token:', err);
+    setError('Invalid token');
+  }
+
   useEffect(() => {
-    console.log('Fetching library for userId:', userId); // Debugging log
     if (!userId) {
       setError('User ID is undefined');
       return;
@@ -28,6 +38,7 @@ function GetLibrary({ userId, token }) {
           throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
         }
         const data = await response.json(); // Parse the JSON response
+        console.log('Fetched library data:', data); // Debugging log
         setLibrary(data);
       } catch (err) {
         console.error('Error fetching library:', err);

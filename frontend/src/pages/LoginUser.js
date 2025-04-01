@@ -9,10 +9,6 @@ function LoginUser() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Login button clicked'); // Debugging log
-    console.log('Username:', username); // Debugging log
-    console.log('Password:', password); // Debugging log
-
     try {
       const response = await fetch('http://localhost:8080/api/users/login', {
         method: 'POST',
@@ -22,16 +18,12 @@ function LoginUser() {
         body: JSON.stringify({ username, password }),
       });
 
-      console.log('Response status:', response.status); // Debugging log
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error response from backend:', errorText); // Debugging log
         throw new Error(`Login failed: ${errorText}`);
       }
 
       const token = await response.text(); // Assuming the backend returns the token as plain text
-      console.log('Token received:', token); // Debugging log
       localStorage.setItem('jwtToken', token); // Store the token in localStorage
       navigate('/get-library'); // Redirect to the library page
     } catch (err) {
