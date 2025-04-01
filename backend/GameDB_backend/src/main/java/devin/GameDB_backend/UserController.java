@@ -40,20 +40,21 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) {
-        System.out.println("Login request received for username: " + loginRequest.getUsername()); // Debugging log
+        System.out.println("Login request received for username: " + loginRequest.getUsername());
 
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-        System.out.println("User found: " + user.getUsername()); // Debugging log
+        System.out.println("User found: " + user.getUsername());
 
         if (!loginRequest.getPassword().equals(user.getPasswordHash())) {
-            System.out.println("Invalid credentials for username: " + loginRequest.getUsername()); // Debugging log
+            System.out.println("Invalid credentials for username: " + loginRequest.getUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
         }
 
-        String token = jwtService.generateToken(user.getUsername());
-        System.out.println("Generated token: " + token); // Debugging log
+        // Generate a token that includes the user_id
+        String token = jwtService.generateToken(user.getUserId(), user.getUsername());
+        System.out.println("Generated token: " + token + " for userId: " + user.getUserId());
         return ResponseEntity.ok(token);
     }
 
@@ -140,6 +141,8 @@ public class UserController {
 
     @GetMapping("/{userId}/library")
     public ResponseEntity<?> getUserLibrary(@PathVariable Long userId) {
+        System.out.println("Fetching library for userId: " + userId); // Debugging log
+
         if (userId == null) {
             return ResponseEntity.badRequest().body("User ID is required");
         }
@@ -155,6 +158,7 @@ public class UserController {
                     ))
                     .collect(Collectors.toList());
 
+            System.out.println("Fetched library games: " + games); // Debugging log
             return ResponseEntity.ok(games);
         } catch (Exception e) {
             e.printStackTrace();
