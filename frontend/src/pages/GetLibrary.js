@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { jwtDecode } from 'jwt-decode'; // Use named export
+import { jwtDecode } from 'jwt-decode';
+import './GetLibrary.css'; // Make sure to create this CSS file in the same directory
 
 function GetLibrary() {
   const [library, setLibrary] = useState([]);
   const [error, setError] = useState(null);
 
-  const token = localStorage.getItem('jwtToken'); // Retrieve the token from localStorage
+  const token = localStorage.getItem('jwtToken');
   let userId;
   try {
-    userId = jwtDecode(token).userId; // Extract user_id from the token
-    console.log('Extracted userId from token:', userId); // Debugging log
+    userId = jwtDecode(token).userId;
+    console.log('Extracted userId from token:', userId);
   } catch (err) {
     console.error('Error decoding token:', err);
     setError('Invalid token');
@@ -25,20 +26,20 @@ function GetLibrary() {
       try {
         const response = await fetch(`http://localhost:8080/api/users/${userId}/library`, {
           method: 'GET',
-          mode: 'cors', // Ensure the request is sent in CORS mode
+          mode: 'cors',
           headers: {
-            Authorization: `Bearer ${token}`, // Include the JWT token in the Authorization header
-            'Content-Type': 'application/json', // Specify JSON content type
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
-          credentials: 'include', // Include cookies or credentials
+          credentials: 'include',
         });
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Error response from backend:', errorText);
           throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
         }
-        const data = await response.json(); // Parse the JSON response
-        console.log('Fetched library data:', data); // Debugging log
+        const data = await response.json();
+        console.log('Fetched library data:', data);
         setLibrary(data);
       } catch (err) {
         console.error('Error fetching library:', err);
@@ -54,20 +55,22 @@ function GetLibrary() {
   }
 
   return (
-    <div>
+    <div className="library-container">
       <h2>Your Library</h2>
-      <ul>
+      <div className="game-grid">
         {library.map((savedGame, index) => (
-          <li key={index}>
-            <h3>{savedGame.game.name}</h3>
-            <img
-              src={savedGame.headerImage}
-              alt={`${savedGame.game.name} header`}
-              style={{ width: '200px', borderRadius: '8px' }}
-            />
-          </li>
+          <div className="card" key={index}>
+            <div className="card2">
+              <img
+                src={savedGame.headerImage}
+                alt={`${savedGame.game.name} header`}
+                className="game-image"
+              />
+              <h3 className="game-title">{savedGame.game.name}</h3>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

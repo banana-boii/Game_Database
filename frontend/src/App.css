@@ -1,38 +1,45 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}
+
 .App {
-  text-align: center;
+  min-height: 100%;
+  background-color: #202020;
+  color: #ffffff; /* This sets the default text color to white for better contrast */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* You may want to adjust other styles to fit with the new dark background */
+header {
+  background-color: #303030; /* A slightly lighter shade for the header */
+  padding: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+nav ul {
+  list-style-type: none;
+  padding: 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+nav ul li {
+  display: inline;
+  margin-right: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+nav ul li a {
+  color: hsl(0, 0%, 100%);
+  text-decoration: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+nav ul li a:hover {
+  text-decoration: underline;
 }
+
+main {
+  padding: 20px;
+}
+

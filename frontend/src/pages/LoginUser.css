@@ -1,0 +1,145 @@
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 525px;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 30px;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .title {
+    font-size: 42px;
+    color: rgb(17, 24, 44);
+    font-weight: 600;
+    letter-spacing: -1.5px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 45px;
+    margin: 0 0 15px 0;
+  }
+  
+  .title::before,
+  .title::after {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    left: 0px;
+    background-color: royalblue;
+  }
+  
+  .title::before {
+    width: 27px;
+    height: 27px;
+    background-color: royalblue;
+  }
+  
+  .title::after {
+    width: 27px;
+    height: 27px;
+    animation: pulse 1s linear infinite;
+  }
+  
+  .message,
+  .signin {
+    color: rgba(88, 87, 87, 0.822);
+    font-size: 21px;
+  }
+  
+  .signin {
+    text-align: center;
+  }
+  
+  .signin a {
+    color: royalblue;
+  }
+  
+  .signin a:hover {
+    text-decoration: underline royalblue;
+  }
+  
+  .form label {
+    position: relative;
+  }
+  
+  .form label .input {
+    width: 100%;
+    padding: 15px 15px 30px 15px;
+    outline: 0;
+    border: 1.5px solid rgba(105, 105, 105, 0.397);
+    border-radius: 15px;
+    font-size: 18px;
+  }
+  
+  .form label .input + span {
+    position: absolute;
+    left: 15px;
+    top: 22px;
+    color: grey;
+    font-size: 1.35em;
+    cursor: text;
+    transition: 0.3s ease;
+  }
+  
+  .form label .input:placeholder-shown + span {
+    top: 22px;
+    font-size: 1.35em;
+  }
+  
+  .form label .input:focus + span,
+  .form label .input:valid + span {
+    top: 45px;
+    font-size: 1.05em;
+    font-weight: 600;
+  }
+  
+  .form label .input:valid + span {
+    color: green;
+  }
+  
+  .submit {
+    border: none;
+    outline: none;
+    background-color: royalblue;
+    padding: 15px;
+    border-radius: 15px;
+    color: #fff;
+    font-size: 24px;
+    transform: .3s ease;
+    cursor: pointer;
+  }
+  
+  .submit:hover {
+    background-color: rgb(56, 90, 194);
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 21px;
+    text-align: center;
+  }
+  
+  @keyframes pulse {
+    from {
+      transform: scale(0.9);
+      opacity: 1;
+    }
+  
+    to {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }

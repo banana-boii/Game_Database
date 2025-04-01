@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './RegisterUser.css'; // Make sure to create this CSS file in the same directory
 
 function RegisterUser() {
   const [formData, setFormData] = useState({
@@ -41,36 +42,94 @@ function RegisterUser() {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
-          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Phone:</label>
-          <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Email:</label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Age:</label>
-          <input type="number" name="age" value={formData.age} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Username:</label>
-          <input type="text" name="username" value={formData.username} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
-        </div>
-        <button type="submit">Register</button>
+    <div className="form-container">
+      <form className="form" onSubmit={handleSubmit}>
+        <p className="title">Register</p>
+        <p className="message">Create an account to access the game library.</p>
+        
+        <label>
+          <input
+            className="input"
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            placeholder=""
+          />
+          <span>Name</span>
+        </label>
+        
+        <label>
+          <input
+            className="input"
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder=""
+          />
+          <span>Phone</span>
+        </label>
+        
+        <label>
+          <input
+            className="input"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder=""
+          />
+          <span>Email</span>
+        </label>
+        
+        <label>
+          <input
+            className="input"
+            type="number"
+            name="age"
+            value={formData.age}
+            onChange={handleChange}
+            required
+            placeholder=""
+          />
+          <span>Age</span>
+        </label>
+        
+        <label>
+          <input
+            className="input"
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            placeholder=""
+          />
+          <span>Username</span>
+        </label>
+        
+        <label>
+          <input
+            className="input"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            placeholder=""
+          />
+          <span>Password</span>
+        </label>
+        
+        <button className="submit" type="submit">Register</button>
+        {error && <p className="error-message">{error}</p>}
+        <p className="signin">
+          Already have an account? <a href="/login">Login</a>
+        </p>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }

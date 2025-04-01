@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './LoginUser.css'; // Make sure to create this CSS file in the same directory
 
 function LoginUser() {
   const [username, setUsername] = useState('');
@@ -23,9 +24,9 @@ function LoginUser() {
         throw new Error(`Login failed: ${errorText}`);
       }
 
-      const token = await response.text(); // Assuming the backend returns the token as plain text
-      localStorage.setItem('jwtToken', token); // Store the token in localStorage
-      navigate('/get-library'); // Redirect to the library page
+      const token = await response.text();
+      localStorage.setItem('jwtToken', token);
+      navigate('/get-library');
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message);
@@ -33,30 +34,38 @@ function LoginUser() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Username:</label>
+    <div className="form-container">
+      <form className="form" onSubmit={handleLogin}>
+        <p className="title">Login</p>
+        <p className="message">Login to access your game library.</p>
+        <label>
           <input
+            className="input"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            placeholder=""
           />
-        </div>
-        <div>
-          <label>Password:</label>
+          <span>Username</span>
+        </label>
+        <label>
           <input
+            className="input"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            placeholder=""
           />
-        </div>
-        <button type="submit">Login</button>
+          <span>Password</span>
+        </label>
+        <button className="submit" type="submit">Login</button>
+        {error && <p className="error-message">{error}</p>}
+        <p className="signin">
+          Don't have an account? <a href="/register">Register</a>
+        </p>
       </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }
