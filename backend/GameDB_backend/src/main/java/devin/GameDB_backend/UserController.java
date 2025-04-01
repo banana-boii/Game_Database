@@ -3,12 +3,13 @@ package devin.GameDB_backend;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional; // Import this
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,7 +30,6 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
         validateUser(user);
-
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully!");
     }
@@ -39,12 +39,10 @@ public class UserController {
         User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-        // Directly compare the provided password with the stored password
         if (!loginRequest.getPassword().equals(user.getPasswordHash())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials.");
         }
 
-        // Generate a placeholder token (or return a success message)
         String token = "dummy-token"; // Replace with actual token logic if needed
         return ResponseEntity.ok(token);
     }
@@ -53,7 +51,6 @@ public class UserController {
     public ResponseEntity<String> addReview(@PathVariable Long userId,
                                             @RequestParam Integer gameId,
                                             @RequestBody Review reviewData) {
-        System.out.println("Received gameId: " + gameId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Game game = gameRepository.findById(gameId)
@@ -88,12 +85,16 @@ public class UserController {
             return ResponseEntity.badRequest().body("Game already in " + collectionType + ".");
         }
 
-        SavedGame savedGame = new SavedGame(user, game, new Timestamp(System.currentTimeMillis()));
+        SavedGame savedGame = new SavedGame();
+        savedGame.setUser(user);
+        savedGame.setGame(game);
+        savedGame.setSavedAt(new Timestamp(System.currentTimeMillis()));
+
         savedGameRepository.save(savedGame);
         return ResponseEntity.ok("Game added to " + collectionType + ".");
     }
 
-    @Transactional // Add this annotation
+    @Transactional
     @DeleteMapping("/{userId}/favorites")
     public ResponseEntity<String> removeFavorite(@PathVariable Long userId,
                                                  @RequestParam Integer gameId) {
@@ -107,19 +108,21 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/favorites")
-    public ResponseEntity<List<SavedGame>> getFavorites(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<SavedGame> favorites = savedGameRepository.findByUser(user);
-        return ResponseEntity.ok(favorites);
+    public ResponseEntity<List<Game>> getUserFavorites(@PathVariable Long userId) {
+        List<SavedGame> favoriteGames = savedGameRepository.findFavoritesByUser_UserId(userId);
+        List<Game> games = favoriteGames.stream()
+                .map(SavedGame::getGame)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(games);
     }
 
     @GetMapping("/{userId}/library")
-    public ResponseEntity<List<SavedGame>> getUserLibrary(@PathVariable Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<SavedGame> library = savedGameRepository.findByUser(user);
-        return ResponseEntity.ok(library);
+    public ResponseEntity<List<Game>> getUserLibrary(@PathVariable Long userId) {
+        List<SavedGame> savedGames = savedGameRepository.findByUser_UserId(userId);
+        List<Game> games = savedGames.stream()
+                .map(SavedGame::getGame)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(games);
     }
 
     @GetMapping("/{userId}/profile")

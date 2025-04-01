@@ -1,38 +1,62 @@
-import React, { useState } from 'react';
-import { getUserLibrary } from '../api';
+import React, { useEffect, useState } from 'react';
 
-function GetLibrary() {
-  const [userId, setUserId] = useState('');
+function GetLibrary({ userId, token }) {
   const [library, setLibrary] = useState([]);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const data = await getUserLibrary(userId);
-      setLibrary(data);
-    } catch (error) {
-      console.error('Error fetching library:', error);
-    }
-  };
+  useEffect(() => {
+    const fetchLibrary = async () => {
+      try {
+        const response = await fetch(`/api/users/${userId}/library`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the JWT token in the Authorization header
+          },
+        });
+        if (!response.ok) {
+          const errorText = await response.text(); // Get the error message from the response
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+        const data = await response.json();
+        setLibrary(data);
+      } catch (err) {
+        console.error('Error fetching library:', err);
+        setError(err.message); // Display the error message
+      }
+    };
+
+    fetchLibrary();
+  }, [userId, token]);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
-      <h2>Get Library</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          required
-        />
-        <button type="submit">Get Library</button>
-      </form>
+      <h2>Your Library</h2>
       <ul>
-        {library.map((savedGame) => (
-          <li key={savedGame.id}>
-            {savedGame.game.name} - {savedGame.game.description}
-          </li>
-        ))}
+        {library.map((savedGame, index) => {
+          // Handle cases where savedGame.game is undefined
+          if (!savedGame.game) {
+            return (
+              <li key={index} style={{ color: 'red' }}>
+                Error: Game data is missing for this entry.
+              </li>
+            );
+          }
+
+          return (
+            <li key={savedGame.game.gameId}>
+              <h3>{savedGame.game.name}</h3>
+              <img
+                src={savedGame.game.headerImage}
+                alt={`${savedGame.game.name} header`}
+                style={{ width: '200px', borderRadius: '8px' }}
+              />
+              <p>Saved At: {new Date(savedGame.savedAt).toLocaleString()}</p>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

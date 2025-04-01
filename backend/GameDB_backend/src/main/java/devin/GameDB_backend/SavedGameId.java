@@ -1,5 +1,6 @@
 package devin.GameDB_backend;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,24 +8,27 @@ import java.util.Objects;
 @Embeddable
 public class SavedGameId implements Serializable {
 
-    private Long userId;
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(name = "game_id")
     private Integer gameId;
 
     // Default constructor
     public SavedGameId() {}
 
     // Constructor
-    public SavedGameId(Long userId, Integer gameId) {
+    public SavedGameId(Integer userId, Integer gameId) {
         this.userId = userId;
         this.gameId = gameId;
     }
 
     // Getters and Setters
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 

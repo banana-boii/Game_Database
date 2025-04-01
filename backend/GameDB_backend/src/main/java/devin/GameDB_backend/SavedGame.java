@@ -4,30 +4,31 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "Saved_Games")
+@Table(name = "saved_games")
 public class SavedGame {
 
     @EmbeddedId
     private SavedGameId id;
 
     @ManyToOne
-    @MapsId("userId")
+    @MapsId("userId") // Maps the userId part of the composite key
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @MapsId("gameId")
+    @MapsId("gameId") // Maps the gameId part of the composite key
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
     @Column(name = "saved_at", nullable = false, updatable = false)
     private Timestamp savedAt;
 
-    // Constructors
+    // Default constructor
     public SavedGame() {}
 
-    public SavedGame(User user, Game game, Timestamp savedAt) {
-        this.id = new SavedGameId(user.getUserId(), game.getGameId());
+    // Constructor
+    public SavedGame(SavedGameId id, User user, Game game, Timestamp savedAt) {
+        this.id = id;
         this.user = user;
         this.game = game;
         this.savedAt = savedAt;
@@ -48,10 +49,6 @@ public class SavedGame {
 
     public void setUser(User user) {
         this.user = user;
-        if (this.id == null) {
-            this.id = new SavedGameId();
-        }
-        this.id.setUserId(user.getUserId());
     }
 
     public Game getGame() {
@@ -60,10 +57,6 @@ public class SavedGame {
 
     public void setGame(Game game) {
         this.game = game;
-        if (this.id == null) {
-            this.id = new SavedGameId();
-        }
-        this.id.setGameId(game.getGameId());
     }
 
     public Timestamp getSavedAt() {

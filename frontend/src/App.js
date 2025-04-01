@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home';
 import GameList from './pages/GameList';
 import GameDetails from './pages/GameDetails';
 import RegisterUser from './pages/RegisterUser';
@@ -15,6 +14,9 @@ import UserProfile from './pages/UserProfile';
 import './styles/App.css';
 
 function App() {
+  const userId = 1; // Replace with the logged-in user's ID
+  const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+
   return (
     <Router>
       <div className="App">
@@ -38,7 +40,8 @@ function App() {
         </header>
         <main>
           <Routes>
-            <Route path="/" element={<Home />} />
+            {/* Set GameList as the default page */}
+            <Route path="/" element={<GameList />} />
             <Route path="/games" element={<GameList />} />
             <Route path="/games/:id" element={<GameDetails />} />
             <Route path="/register" element={<RegisterUser />} />
@@ -48,7 +51,7 @@ function App() {
             <Route path="/add-to-library" element={<AddToLibrary />} />
             <Route path="/remove-favorite" element={<RemoveFavorite />} />
             <Route path="/get-favorites" element={<GetFavorites />} />
-            <Route path="/get-library" element={<GetLibrary />} />
+            <Route path="/get-library" element={<GetLibrary userId={userId} token={token} />} />
             <Route path="/user-profile" element={<UserProfile />} />
           </Routes>
         </main>
